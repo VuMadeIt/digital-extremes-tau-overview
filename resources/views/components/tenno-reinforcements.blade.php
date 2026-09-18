@@ -1,7 +1,8 @@
-<section class="tenno" data-node-id="3692:6276" data-animate="section" data-rain-zone>
+<section class="tenno" data-node-id="3692:6276" data-animate="section" data-rain-zone="tenno">
     <div class="tenno__atmosphere" aria-hidden="true">
         <img class="tenno__wash" src="<?= e(asset_url('section_bg')) ?>" alt="">
-        <img class="tenno__rain" src="<?= e(asset_url('black_rain')) ?>" alt="">
+        <img class="tenno__rain tenno__rain--tex" src="<?= e(asset_url('black_rain')) ?>" alt="">
+        <img class="tenno__rain tenno__rain--tex tenno__rain--tex-b" src="<?= e(asset_url('black_rain')) ?>" alt="">
         <img class="tenno__smoke tenno__smoke--a fog-sway" src="<?= e(asset_url('smoke')) ?>" alt="" data-fog>
         <img class="tenno__smoke tenno__smoke--b fog-sway" src="<?= e(asset_url('smoke')) ?>" alt="" data-fog>
     </div>

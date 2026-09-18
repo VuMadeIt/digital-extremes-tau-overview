@@ -624,7 +624,7 @@ a {
 
 .starchart {
   position: relative;
-  padding: 80px 0 0;
+  padding: 80px 0 120px;
   overflow: hidden;
   background: #0a0c0d;
 }
@@ -633,6 +633,8 @@ a {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
 }
 
 .starchart__wash {
@@ -661,25 +663,29 @@ a {
   height: 200%;
   object-fit: cover;
   mix-blend-mode: multiply;
-  opacity: 0.28;
+  opacity: 0.12;
   pointer-events: none;
 }
 .starchart__rain--tex {
-  animation: rain-tex-fall 1.15s linear infinite;
+  animation: rain-tex-fall 1.6s linear infinite;
 }
 .starchart__rain--tex-b {
   top: -100%;
-  opacity: 0.18;
-  animation-duration: 0.95s;
-  animation-delay: -0.4s;
+  opacity: 0.08;
+  animation-duration: 1.35s;
+  animation-delay: -0.5s;
 }
 
 .starchart__smoke {
   position: absolute;
   top: 8%;
   width: 55%;
-  opacity: 0.35;
+  max-height: 70%;
+  opacity: 0.28;
   will-change: transform;
+  object-fit: cover;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 20%, transparent 75%);
 }
 .starchart__smoke--left {
   left: -18%;
@@ -738,14 +744,14 @@ a {
   z-index: 1;
   width: 1920px;
   margin: 0 auto;
-  padding: 0 0 80px;
-  overflow: visible;
+  padding: 0 0 40px;
+  overflow: hidden;
 }
 
 .planet {
   position: relative;
   width: 1920px;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .planet--fornax {
@@ -754,8 +760,8 @@ a {
 }
 
 .planet--perita {
-  height: 1567px;
-  margin-top: -280px;
+  height: 1480px;
+  margin-top: -180px;
 }
 
 .planet__copy {
@@ -778,13 +784,15 @@ a {
 
 .planet--perita .planet__copy {
   left: 1044px;
-  top: 715px;
+  top: 620px;
 }
 
 .planet__visual {
   position: absolute;
-  overflow: visible;
+  overflow: hidden;
   pointer-events: none;
+  z-index: 1;
+  background: transparent;
 }
 
 .planet--fornax .planet__visual {
@@ -796,9 +804,9 @@ a {
 
 .planet--perita .planet__visual {
   top: 0;
-  left: -120px;
-  width: 1132px;
-  height: 1567px;
+  left: -40px;
+  width: 980px;
+  height: 1360px;
 }
 
 .planet__image {
@@ -808,20 +816,29 @@ a {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: center;
+  object-position: left center;
   filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.45));
-  mask-image: none;
+}
+
+.planet--perita .planet__image {
+  object-position: center center;
+  width: 92%;
+  height: 92%;
+  top: 4%;
+  left: 0;
 }
 
 .planet__rocks {
   position: absolute;
-  left: 520px;
-  top: 720px;
-  width: 693px;
+  left: 42%;
+  top: 58%;
+  width: 55%;
   height: auto;
-  opacity: 0.95;
+  opacity: 0.9;
   pointer-events: none;
   z-index: 2;
+  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 40% 40%, #000 30%, transparent 78%);
+  mask-image: radial-gradient(ellipse 65% 55% at 40% 40%, #000 30%, transparent 78%);
 }
 
 .planet__structure {
@@ -843,35 +860,22 @@ a {
   height: 361px;
 }
 
-.planet__fog {
-  position: absolute;
-  left: -20%;
-  bottom: -10%;
-  width: 140%;
-  height: auto;
-  opacity: 0.35;
-  pointer-events: none;
-  z-index: 2;
-  mix-blend-mode: screen;
-}
-
-.planet--fornax .planet__fog {
-  left: -40%;
-  top: -10%;
-  opacity: 0.28;
-}
-
+.planet__fog,
 .planet__node {
-  display: none;
+  display: none !important;
 }
 
 .brysko {
   position: relative;
-  margin: 0;
+  width: 1920px;
+  margin: 0 auto;
+  isolation: isolate;
+  z-index: 2;
 }
 
 .brysko__stage {
   position: relative;
+  width: 1920px;
   height: 1080px;
   overflow: hidden;
   background: #0f0b08;
@@ -880,31 +884,66 @@ a {
 .brysko__bg {
   position: absolute;
   top: 0;
-  right: -8%;
-  width: 118%;
-  height: 115%;
+  left: 305px;
+  width: 1920px;
+  height: 1080px;
   object-fit: cover;
   object-position: center top;
   transform: scaleX(-1);
+  z-index: 0;
 }
 
 .brysko__scrim {
   position: absolute;
-  inset: 0;
-  width: 55%;
-  background: linear-gradient(90deg, #0f0b08 18%, rgba(15, 11, 8, 0.88) 48%, rgba(15, 11, 8, 0) 100%);
+  top: 0;
+  left: 0;
+  width: 781px;
+  height: 1080px;
+  background: linear-gradient(270deg, rgba(15, 11, 8, 0) 0%, #0f0b08 100%);
   pointer-events: none;
+  z-index: 1;
+}
+
+.brysko__frame {
+  position: absolute;
+  left: -2px;
+  width: 1924px;
+  height: 101px;
+  z-index: 6;
+  pointer-events: none;
+  line-height: 0;
+  filter: drop-shadow(0 17px 21.4px rgba(0, 0, 0, 0.42));
+}
+.brysko__frame img {
+  width: 100%;
+  height: 101px;
+  object-fit: cover;
+  display: block;
+}
+.brysko__frame--top {
+  top: -8px;
+}
+.brysko__frame--top img {
+  transform: rotate(-2deg) scale(1.01);
+}
+.brysko__frame--bottom {
+  top: auto;
+  bottom: -6px;
+  filter: drop-shadow(0 -10px 21.4px rgba(0, 0, 0, 0.42));
+}
+.brysko__frame--bottom img {
+  transform: matrix(1, -0.03, -0.03, -1, 0, 0) scale(1.01);
 }
 
 .brysko__content {
   position: relative;
-  z-index: 1;
+  z-index: 4;
   width: 666px;
   margin-left: 144px;
-  padding: 160px 0 72px;
+  padding: 193px 0 72px;
   display: flex;
   flex-direction: column;
-  gap: 36px;
+  gap: 40px;
 }
 
 .brysko__name {
@@ -1033,19 +1072,19 @@ a {
   position: relative;
   width: 1920px;
   margin: 0 auto;
-  padding: 0;
-  overflow: visible;
-  background: transparent;
+  padding: 80px 0 120px;
+  overflow: hidden;
+  background: #0b0e10;
+  isolation: isolate;
+  z-index: 1;
 }
 
 .tenno__atmosphere {
   position: absolute;
-  left: -636px;
-  top: -1300px;
-  width: 3192px;
-  height: 3764.5px;
+  inset: 0;
   pointer-events: none;
   z-index: 0;
+  overflow: hidden;
 }
 
 .tenno__wash,
@@ -1056,37 +1095,51 @@ a {
 }
 
 .tenno__wash {
-  left: 0;
-  top: 982px;
-  width: 3192px;
-  height: 1653px;
+  left: -20%;
+  top: 10%;
+  width: 140%;
+  height: 80%;
   filter: blur(38px);
-  opacity: 0.85;
+  opacity: 0.45;
 }
 
 .tenno__rain {
-  left: 633px;
-  top: 1030px;
-  width: 1925px;
-  height: 1980px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 200%;
   mix-blend-mode: multiply;
-  opacity: 0.7;
+  opacity: 0.14;
+  pointer-events: none;
+}
+.tenno__rain--tex {
+  animation: rain-tex-fall 1.55s linear infinite;
+}
+.tenno__rain--tex-b {
+  top: -100%;
+  opacity: 0.09;
+  animation-duration: 1.3s;
+  animation-delay: -0.45s;
 }
 
 .tenno__smoke {
-  width: 2245.39px;
-  height: 1502.68px;
-  opacity: 0.45;
+  width: 70%;
+  height: auto;
+  max-height: 60%;
+  opacity: 0.3;
+  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 50%, #000 25%, transparent 78%);
+  mask-image: radial-gradient(ellipse 65% 55% at 50% 50%, #000 25%, transparent 78%);
 }
 .tenno__smoke--a {
-  left: 250px;
-  top: 0;
-  transform: rotate(-161.84deg);
+  left: -10%;
+  top: 5%;
+  transform: rotate(-12deg);
 }
 .tenno__smoke--b {
-  left: 51px;
-  top: 784px;
-  transform: rotate(22.92deg);
+  right: -15%;
+  left: auto;
+  top: 35%;
+  transform: rotate(18deg);
 }
 
 .tenno__inner {
@@ -1094,7 +1147,6 @@ a {
   z-index: 1;
   width: 1760px;
   margin: 0 auto;
-  left: -24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1706,7 +1758,7 @@ a {
   inset: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.55;
+  opacity: 0.35;
   mix-blend-mode: soft-light;
 }
 

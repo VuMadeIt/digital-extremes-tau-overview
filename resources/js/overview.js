@@ -167,19 +167,19 @@ function initBlackRain(reduceMotion) {
   }
 
   function seedDrops() {
-    const count = Math.min(160, Math.floor(width / 10));
+    const count = Math.min(90, Math.floor(width / 16));
     drops = Array.from({ length: count }, () => makeDrop(true));
-    heavies = Array.from({ length: 10 }, () => makeHeavy(true));
+    heavies = Array.from({ length: 5 }, () => makeHeavy(true));
   }
 
   function makeDrop(randomY) {
     return {
       x: Math.random() * width,
       y: randomY ? Math.random() * height : -20 - Math.random() * 80,
-      len: 10 + Math.random() * 18,
-      speed: 14 + Math.random() * 16,
-      alpha: 0.12 + Math.random() * 0.22,
-      width: 0.7 + Math.random() * 0.7,
+      len: 8 + Math.random() * 12,
+      speed: 11 + Math.random() * 12,
+      alpha: 0.06 + Math.random() * 0.1,
+      width: 0.55 + Math.random() * 0.45,
     };
   }
 
@@ -187,11 +187,25 @@ function initBlackRain(reduceMotion) {
     return {
       x: Math.random() * width,
       y: randomY ? Math.random() * height : -40,
-      len: 22 + Math.random() * 28,
-      speed: 20 + Math.random() * 18,
-      alpha: 0.28 + Math.random() * 0.25,
-      width: 1.2 + Math.random() * 1.1,
+      len: 14 + Math.random() * 16,
+      speed: 15 + Math.random() * 12,
+      alpha: 0.1 + Math.random() * 0.12,
+      width: 0.85 + Math.random() * 0.6,
     };
+  }
+
+  function activeRainZones() {
+    return Array.from(document.querySelectorAll('[data-rain-zone]')).filter((zone) => {
+      const rect = zone.getBoundingClientRect();
+      return rect.bottom > 80 && rect.top < height - 80;
+    });
+  }
+
+  function inBrysko() {
+    const brysko = document.querySelector('.brysko');
+    if (!brysko) return false;
+    const rect = brysko.getBoundingClientRect();
+    return rect.top < height * 0.55 && rect.bottom > height * 0.35;
   }
 
   function spawnHit(x, y, kind) {
@@ -204,11 +218,17 @@ function initBlackRain(reduceMotion) {
   }
 
   function surfaceTops() {
-    const nodes = document.querySelectorAll(
-      '[data-rain-surface], .section-divider, .qol__edge, .hub-tile, .promo-card, .mode-card, .starchart__map, .planet__image'
-    );
+    // Prefer surfaces inside rain zones; never hit Brysko frames/UI
+    const zones = activeRainZones();
+    const scope = zones.length
+      ? zones.flatMap((z) => Array.from(z.querySelectorAll('[data-rain-surface], .mode-card, .starchart__map, .planet__image, .qol-card')))
+      : [];
+    const nodes = scope.length
+      ? scope
+      : document.querySelectorAll('[data-rain-surface], .mode-card, .starchart__map, .hub-tile, .promo-card');
     const list = [];
     nodes.forEach((node) => {
+      if (node.closest('.brysko')) return;
       const rect = node.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top > height || rect.width < 40) return;
       list.push(rect);
@@ -217,20 +237,22 @@ function initBlackRain(reduceMotion) {
   }
 
   function maybeInteract(now) {
-    if (now - lastHit < 90) return;
+    if (inBrysko()) return;
+    if (!activeRainZones().length) return;
+    if (now - lastHit < 160) return;
     const surfaces = surfaceTops();
     if (!surfaces.length) return;
 
-    if (Math.random() < 0.55) {
+    if (Math.random() < 0.28) {
       const rect = surfaces[Math.floor(Math.random() * surfaces.length)];
       const x = rect.left + Math.random() * rect.width;
       const y = rect.top + 1 + Math.random() * 3;
-      spawnHit(x, y, Math.random() > 0.7 ? 'ripple' : 'splash');
+      spawnHit(x, y, Math.random() > 0.75 ? 'ripple' : 'splash');
       lastHit = now;
-      if (audio.enabled && Math.random() > 0.65) audio.splash();
+      if (audio.enabled && Math.random() > 0.8) audio.splash();
     }
 
-    if (now - lastDrip > 900 && Math.random() < 0.35) {
+    if (now - lastDrip > 1400 && Math.random() < 0.22) {
       const rect = surfaces[Math.floor(Math.random() * surfaces.length)];
       const x = rect.left + 20 + Math.random() * Math.max(20, rect.width - 40);
       const y = rect.bottom - 2;
@@ -243,32 +265,41 @@ function initBlackRain(reduceMotion) {
   function tick(now) {
     ctx.clearRect(0, 0, width, height);
 
-    for (let i = 0; i < drops.length; i += 1) {
-      const d = drops[i];
-      d.y += d.speed;
-      d.x += 0.15;
-      if (d.y > height + 20) drops[i] = makeDrop(false);
-      ctx.strokeStyle = `rgba(18, 18, 18, ${d.alpha})`;
-      ctx.lineWidth = d.width;
-      ctx.beginPath();
-      ctx.moveTo(d.x, d.y);
-      ctx.lineTo(d.x - 0.4, d.y + d.len);
-      ctx.stroke();
+    const zonesOn = activeRainZones().length > 0;
+    const bryskoFocus = inBrysko();
+    // Mute canvas rain while Brysko is the focus; keep starchart/tenno subtle
+    const fade = bryskoFocus ? 0.08 : zonesOn ? 0.42 : 0.22;
+    canvas.style.opacity = String(fade);
+
+    if (!bryskoFocus) {
+      for (let i = 0; i < drops.length; i += 1) {
+        const d = drops[i];
+        d.y += d.speed;
+        d.x += 0.12;
+        if (d.y > height + 20) drops[i] = makeDrop(false);
+        ctx.strokeStyle = `rgba(12, 12, 12, ${d.alpha})`;
+        ctx.lineWidth = d.width;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x - 0.35, d.y + d.len);
+        ctx.stroke();
+      }
+
+      for (let i = 0; i < heavies.length; i += 1) {
+        const d = heavies[i];
+        d.y += d.speed;
+        if (d.y > height + 30) heavies[i] = makeHeavy(false);
+        ctx.strokeStyle = `rgba(6, 6, 6, ${d.alpha})`;
+        ctx.lineWidth = d.width;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x - 0.55, d.y + d.len);
+        ctx.stroke();
+      }
+
+      maybeInteract(now || performance.now());
     }
 
-    for (let i = 0; i < heavies.length; i += 1) {
-      const d = heavies[i];
-      d.y += d.speed;
-      if (d.y > height + 30) heavies[i] = makeHeavy(false);
-      ctx.strokeStyle = `rgba(8, 8, 8, ${d.alpha})`;
-      ctx.lineWidth = d.width;
-      ctx.beginPath();
-      ctx.moveTo(d.x, d.y);
-      ctx.lineTo(d.x - 0.8, d.y + d.len);
-      ctx.stroke();
-    }
-
-    maybeInteract(now || performance.now());
     raf = window.requestAnimationFrame(tick);
   }
 

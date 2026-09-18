@@ -1,11 +1,14 @@
 <section class="brysko" data-node-id="3611:6771" data-animate="section">
-    <div class="section-divider section-divider--top" aria-hidden="true">
-        <img src="<?= e(asset_url('divider_jagged')) ?>" alt="">
-    </div>
-
     <div class="brysko__stage">
         <img class="brysko__bg" src="<?= e(asset_url('brysko_bg')) ?>" alt="">
         <div class="brysko__scrim"></div>
+
+        <div class="brysko__frame brysko__frame--top" aria-hidden="true">
+            <img src="<?= e(asset_url('divider_jagged')) ?>" alt="">
+        </div>
+        <div class="brysko__frame brysko__frame--bottom" aria-hidden="true">
+            <img src="<?= e(asset_url('divider_jagged')) ?>" alt="">
+        </div>
 
         <div class="brysko__content">
             <div class="brysko__titles">
@@ -59,9 +62,5 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="section-divider section-divider--bottom" aria-hidden="true">
-        <img src="<?= e(asset_url('divider_jagged')) ?>" alt="">
     </div>
 </section>

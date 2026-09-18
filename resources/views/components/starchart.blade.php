@@ -1,4 +1,4 @@
-<section class="starchart" data-node-id="3694:6782" data-animate="section" data-rain-zone>
+<section class="starchart" data-node-id="3694:6782" data-animate="section" data-rain-zone="starchart">
     <div class="starchart__atmosphere" aria-hidden="true">
         <img class="starchart__wash" src="<?= e(asset_url('section_bg')) ?>" alt="">
         <img class="starchart__rings" src="<?= e(asset_url('rings')) ?>" alt="">
@@ -64,7 +64,6 @@
                             >
                         <?php endforeach; ?>
                     <?php endif; ?>
-                    <img class="planet__fog fog-sway" src="<?= e(asset_url('smoke')) ?>" alt="" aria-hidden="true" data-fog>
                 </div>
             </article>
         <?php endforeach; ?>
