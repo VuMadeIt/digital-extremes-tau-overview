@@ -62,6 +62,12 @@ class OverviewController
                     'cta' => 'Explore Fornax',
                     'image' => asset_url('planet_fornax'),
                     'align' => 'left',
+                    'imgW' => 1171,
+                    'imgH' => 1353,
+                    'structures' => [
+                        asset_url('sentient_structure'),
+                        asset_url('sentient_structure'),
+                    ],
                 ],
                 [
                     'id' => 'perita',
@@ -70,6 +76,9 @@ class OverviewController
                     'cta' => 'Explore Perita',
                     'image' => asset_url('planet_perita'),
                     'align' => 'right',
+                    'imgW' => 1132,
+                    'imgH' => 1567,
+                    'rocks' => asset_url('rocks_dust'),
                 ],
             ],
             'abilities' => [

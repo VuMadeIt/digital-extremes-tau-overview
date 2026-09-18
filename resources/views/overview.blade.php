@@ -15,6 +15,20 @@
         'subnavLinks' => $subnavLinks,
     ]) ?>
 
+    <div class="fx-rain" data-fx-rain aria-hidden="true">
+        <canvas class="fx-rain__canvas" data-rain-canvas></canvas>
+        <div class="fx-rain__hits" data-rain-hits></div>
+    </div>
+    <button
+        type="button"
+        class="fx-rain__toggle"
+        data-rain-audio-toggle
+        aria-pressed="false"
+        title="Toggle rainfall ambience"
+    >
+        Rain audio off
+    </button>
+
     <main id="overview">
         <?= component('hero') ?>
         <?= component('hub-nav', ['tiles' => $hubTiles]) ?>

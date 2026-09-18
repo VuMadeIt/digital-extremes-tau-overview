@@ -1,9 +1,9 @@
-<section class="tenno" data-node-id="3692:6276" data-animate="section">
+<section class="tenno" data-node-id="3692:6276" data-animate="section" data-rain-zone>
     <div class="tenno__atmosphere" aria-hidden="true">
         <img class="tenno__wash" src="<?= e(asset_url('section_bg')) ?>" alt="">
         <img class="tenno__rain" src="<?= e(asset_url('black_rain')) ?>" alt="">
-        <img class="tenno__smoke tenno__smoke--a" src="<?= e(asset_url('smoke')) ?>" alt="">
-        <img class="tenno__smoke tenno__smoke--b" src="<?= e(asset_url('smoke')) ?>" alt="">
+        <img class="tenno__smoke tenno__smoke--a fog-sway" src="<?= e(asset_url('smoke')) ?>" alt="" data-fog>
+        <img class="tenno__smoke tenno__smoke--b fog-sway" src="<?= e(asset_url('smoke')) ?>" alt="" data-fog>
     </div>
 
     <div class="tenno__inner">
@@ -24,7 +24,7 @@
 
         <div class="tenno__grid">
             <?php foreach ($cards as $card): ?>
-                <article class="mode-card" data-animate="card">
+                <article class="mode-card" data-animate="card" data-rain-surface>
                     <div class="mode-card__media">
                         <img src="<?= e($card['image']) ?>" alt="">
                     </div>
