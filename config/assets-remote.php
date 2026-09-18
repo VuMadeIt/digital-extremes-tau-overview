@@ -42,6 +42,7 @@ return [
     'planet_perita' => 'https://www.figma.com/api/mcp/asset/65b4d0cc-305b-42dd-b4a5-a1848c8437f6.png',
     'rocks_dust' => 'https://www.figma.com/api/mcp/asset/5ae9ddb3-1450-43d0-8f38-a85a8cd0c59d.png',
     'sentient_structure' => 'https://www.figma.com/api/mcp/asset/b7c79318-0f0a-4e0b-a735-0e127b40870a.png',
+    'sentient_structure_b' => 'https://www.figma.com/api/mcp/asset/0a633b06-82e7-4b14-a03a-87776c0cdbfb.png',
     'brysko_bg' => 'https://www.figma.com/api/mcp/asset/803a4b3a-cada-420d-a721-b271fa1674d7.png',
     'ability_card' => 'https://www.figma.com/api/mcp/asset/c10c05d3-2503-497e-ac91-0e14887104b2.png',
     'ability_1' => 'https://www.figma.com/api/mcp/asset/f6807c47-9ef6-4fc5-a71b-abce74a05c86.svg',

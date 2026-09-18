@@ -33,7 +33,7 @@
         <?= component('hero') ?>
         <?= component('hub-nav', ['tiles' => $hubTiles]) ?>
         <?= component('update-summary', ['promoCards' => $promoCards]) ?>
-        <?= component('starchart', ['planets' => $planets]) ?>
+        <?= component('starchart') ?>
         <?= component('brysko', ['abilities' => $abilities]) ?>
         <?= component('tenno-reinforcements', ['cards' => $tennoCards]) ?>
         <?= component('qol', ['cards' => $qolCards]) ?>

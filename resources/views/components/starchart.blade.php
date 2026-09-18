@@ -18,63 +18,122 @@
                 Description of update lorem
             </p>
         </div>
-        <div class="starchart__map" data-rain-ledge>
+        <div class="starchart__map" data-rain-border>
             <img src="<?= e(asset_url('starchart_map')) ?>" alt="Tau starchart map">
         </div>
     </div>
 
-    <div class="planets">
-        <?php foreach ($planets as $planet): ?>
-            <article
-                id="<?= e($planet['id']) ?>"
-                class="planet planet--<?= e($planet['align']) ?> planet--<?= e($planet['id']) ?>"
-                data-animate="planet"
+    {{-- Planets: Figma frame 3599:6418 — page coords relative to y=4495 --}}
+    <div class="planets" data-node-id="3599:6418">
+        {{-- Fornax smoke (behind) --}}
+        <img
+            class="planets__smoke planets__smoke--fornax-a fog-sway"
+            src="<?= e(asset_url('smoke')) ?>"
+            alt=""
+            aria-hidden="true"
+            data-fog
+        >
+        <img
+            class="planets__smoke planets__smoke--fornax-b fog-sway"
+            src="<?= e(asset_url('smoke')) ?>"
+            alt=""
+            aria-hidden="true"
+            data-fog
+        >
+
+        {{-- Fornax planet + markers --}}
+        <div class="planets__fornax-art">
+            <img
+                class="planets__fornax-planet"
+                src="<?= e(asset_url('planet_fornax')) ?>"
+                alt="Fornax"
+                width="2214"
+                height="1353"
             >
-                <div class="planet__copy">
-                    <h3 class="heading-imbue heading-imbue--lg"><?= e($planet['name']) ?></h3>
-                    <p><?= e($planet['body']) ?></p>
-                    <a class="btn btn--primary planet__cta" href="#<?= e($planet['id']) ?>"><?= e($planet['cta']) ?></a>
-                </div>
+            <span class="planets__marker" style="left: 195.75px; top: 211px;" aria-hidden="true"></span>
+            <span class="planets__marker" style="left: 26px; top: 526px;" aria-hidden="true"></span>
+            <span class="planets__marker" style="left: 601px; top: 961px;" aria-hidden="true"></span>
+            <span class="planets__marker" style="left: 794px; top: 1196px;" aria-hidden="true"></span>
+        </div>
 
-                <div class="planet__visual">
-                    <img
-                        class="planet__image"
-                        src="<?= e($planet['image']) ?>"
-                        alt="<?= e($planet['name']) ?>"
-                        width="<?= (int) ($planet['imgW'] ?? 1107) ?>"
-                        height="<?= (int) ($planet['imgH'] ?? 676) ?>"
-                    >
-                    <?php if (!empty($planet['rocks'])): ?>
-                        <img
-                            class="planet__rocks"
-                            src="<?= e($planet['rocks']) ?>"
-                            alt=""
-                            aria-hidden="true"
-                            width="693"
-                            height="594"
-                        >
-                    <?php endif; ?>
-                    <?php if (!empty($planet['structures'])): ?>
-                        <?php foreach ($planet['structures'] as $i => $structure): ?>
-                            <img
-                                class="planet__structure planet__structure--<?= $i + 1 ?>"
-                                src="<?= e($structure) ?>"
-                                alt=""
-                                aria-hidden="true"
-                            >
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+        <img
+            class="planets__structure planets__structure--a"
+            src="<?= e(asset_url('sentient_structure')) ?>"
+            alt=""
+            aria-hidden="true"
+            width="265"
+            height="466"
+        >
+        <img
+            class="planets__structure planets__structure--b"
+            src="<?= e(asset_url('sentient_structure_b')) ?>"
+            alt=""
+            aria-hidden="true"
+            width="524"
+            height="361"
+        >
 
-                    <?php foreach (($planet['markers'] ?? []) as $marker): ?>
-                        <span
-                            class="planet__marker"
-                            data-rain-marker
-                            style="left: <?= e($marker['x']) ?>%; top: <?= e($marker['y']) ?>%;"
-                            aria-hidden="true"
-                        ></span>
-                    <?php endforeach; ?>
-                </div>
-            </article>
-        <?php endforeach; ?>
+        <div class="planets__copy planets__copy--fornax">
+            <h3 class="heading-imbue heading-imbue--lg">Fornax</h3>
+            <p>
+                Lorem ipsum dolor sit amet consectetur. Id pellentesque quis id pellentesque.
+                Turpis arcu nec massa integer et enim odio faucibus amet. Lorem ipsum dolor sit amet
+                consectetur. Id pellentesque quis id pellentesque. Turpis arcu nec massa integer et
+                enim odio faucibus amet.
+            </p>
+            <a class="btn btn--primary planet__cta" href="#fornax">Explore Fornax</a>
+        </div>
+
+        {{-- Perita smoke --}}
+        <img
+            class="planets__smoke planets__smoke--perita-a fog-sway"
+            src="<?= e(asset_url('smoke')) ?>"
+            alt=""
+            aria-hidden="true"
+            data-fog
+        >
+        <img
+            class="planets__smoke planets__smoke--perita-b fog-sway"
+            src="<?= e(asset_url('smoke')) ?>"
+            alt=""
+            aria-hidden="true"
+            data-fog
+        >
+
+        <div class="planets__perita-art">
+            <img
+                class="planets__perita-planet"
+                src="<?= e(asset_url('planet_perita')) ?>"
+                alt="Perita"
+                width="1113"
+                height="1105"
+            >
+            <span class="planets__marker" style="left: 816px; top: 353px;" aria-hidden="true"></span>
+            <span class="planets__marker" style="left: 1109px; top: 595px;" aria-hidden="true"></span>
+            <span class="planets__marker" style="left: 756px; top: 878px;" aria-hidden="true"></span>
+            <span class="planets__marker" style="left: 936px; top: 1176px;" aria-hidden="true"></span>
+        </div>
+
+        <img
+            class="planets__rocks"
+            src="<?= e(asset_url('rocks_dust')) ?>"
+            alt=""
+            aria-hidden="true"
+            width="1195"
+            height="702"
+        >
+
+        <div class="planets__copy planets__copy--perita" id="perita">
+            <h3 class="heading-imbue heading-imbue--lg">Perita</h3>
+            <p>
+                Lorem ipsum dolor sit amet consectetur. Id pellentesque quis id pellentesque.
+                Turpis arcu nec massa integer et enim odio faucibus amet. Lorem ipsum dolor sit amet
+                consectetur. Id pellentesque quis id pellentesque. Turpis arcu nec massa integer et
+                enim odio faucibus amet.
+            </p>
+            <a class="btn btn--primary planet__cta" href="#perita">Explore Perita</a>
+        </div>
+
+        <span id="fornax" class="planets__anchor" aria-hidden="true"></span>
     </div>
 </section>

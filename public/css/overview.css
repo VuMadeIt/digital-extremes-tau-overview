@@ -624,8 +624,8 @@ a {
 
 .starchart {
   position: relative;
-  padding: 80px 0 120px;
-  overflow: hidden;
+  padding: 80px 0 0;
+  overflow: visible;
   background: #0a0c0d;
 }
 
@@ -743,43 +743,49 @@ a {
   position: relative;
   z-index: 1;
   width: 1920px;
+  height: 3250px;
   margin: 0 auto;
-  padding: 0 0 80px;
   overflow: visible;
+  pointer-events: none;
 }
 
-.planet {
-  position: relative;
-  width: 1920px;
-  overflow: visible;
-}
-
-.planet--fornax {
-  height: 1280px;
-  margin-top: 24px;
-}
-
-.planet--perita {
-  height: 1320px;
-  margin-top: -160px;
-}
-
-.planet__copy {
+.planets__anchor {
   position: absolute;
-  z-index: 3;
+  left: 80px;
+  top: 530px;
+  width: 1px;
+  height: 1px;
+}
+
+.planets__copy {
+  position: absolute;
+  z-index: 5;
   width: 647px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
+  pointer-events: auto;
 }
-.planet__copy p {
+.planets__copy p {
   margin: 0 0 16px;
-  color: var(--text);
+  color: #c2c2c2;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.planets__copy--fornax {
+  left: 80px;
+  top: 530px;
+}
+
+.planets__copy--perita {
+  left: 1044px;
+  top: 1773px;
 }
 
 .planet__cta,
-.planet .btn--primary {
+.planets__copy .btn--primary {
   box-sizing: border-box;
   width: 215px;
   min-width: 215px;
@@ -790,116 +796,153 @@ a {
   flex: none;
 }
 
-.planet--fornax .planet__copy {
-  left: 80px;
-  top: 288px;
-}
-
-.planet--perita .planet__copy {
-  left: 1044px;
-  top: 560px;
-}
-
-.planet__visual {
+.planets__fornax-art {
   position: absolute;
-  overflow: visible;
-  pointer-events: none;
-  z-index: 1;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-
-.planet--fornax .planet__visual {
-  top: 0;
-  left: 680px;
-  width: 1240px;
-  height: 1280px;
-}
-
-.planet--perita .planet__visual {
-  top: 0;
-  left: -80px;
-  width: 1040px;
-  height: 1280px;
-}
-
-.planet__image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-  -webkit-mask-image: radial-gradient(ellipse 72% 68% at 50% 48%, #000 42%, rgba(0, 0, 0, 0.85) 62%, transparent 82%);
-  mask-image: radial-gradient(ellipse 72% 68% at 50% 48%, #000 42%, rgba(0, 0, 0, 0.85) 62%, transparent 82%);
-  filter: none;
-}
-
-.planet--fornax .planet__image {
-  object-position: left center;
-  -webkit-mask-image: radial-gradient(ellipse 78% 72% at 42% 48%, #000 38%, rgba(0, 0, 0, 0.9) 58%, transparent 80%);
-  mask-image: radial-gradient(ellipse 78% 72% at 42% 48%, #000 38%, rgba(0, 0, 0, 0.9) 58%, transparent 80%);
-}
-
-.planet--perita .planet__image {
-  object-position: center center;
-  width: 94%;
-  height: 94%;
-  top: 2%;
-  left: 0;
-  -webkit-mask-image: radial-gradient(ellipse 70% 66% at 48% 46%, #000 40%, rgba(0, 0, 0, 0.88) 60%, transparent 78%);
-  mask-image: radial-gradient(ellipse 70% 66% at 48% 46%, #000 40%, rgba(0, 0, 0, 0.88) 60%, transparent 78%);
-}
-
-.planet__rocks {
-  position: absolute;
-  left: 42%;
-  top: 58%;
-  width: 55%;
-  height: auto;
-  opacity: 0.85;
-  pointer-events: none;
+  left: 749px;
+  top: 242px;
+  width: 2214px;
+  height: 1353px;
   z-index: 2;
-  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 40% 40%, #000 30%, transparent 78%);
-  mask-image: radial-gradient(ellipse 65% 55% at 40% 40%, #000 30%, transparent 78%);
+  background: transparent;
 }
 
-.planet__structure {
+.planets__fornax-planet {
   position: absolute;
-  z-index: 1;
-  opacity: 0.85;
-  object-fit: contain;
+  inset: 0;
+  width: 2214px;
+  height: 1353px;
+  object-fit: cover;
+  object-position: left center;
+  background: transparent;
 }
-.planet__structure--1 {
-  left: -720px;
-  top: 480px;
+
+.planets__perita-art {
+  position: absolute;
+  left: -434px;
+  top: 1058px;
+  width: 1565px;
+  height: 1566px;
+  z-index: 2;
+  background: transparent;
+}
+
+.planets__perita-planet {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1112.75px;
+  height: 1104.6px;
+  object-fit: contain;
+  background: transparent;
+  transform: rotate(-48.01deg);
+  transform-origin: center center;
+}
+
+.planets__marker {
+  position: absolute;
+  z-index: 4;
+  width: 36.72px;
+  height: 36.72px;
+  margin-left: -18.36px;
+  margin-top: -18.36px;
+  background: #ddc57d;
+  border-radius: 1px;
+  transform: rotate(45deg);
+  box-shadow: 0 0 0 6px transparent;
+  pointer-events: none;
+}
+.planets__marker::before {
+  content: "";
+  position: absolute;
+  inset: -5.68px;
+  border: 1px solid #ddc57d;
+  border-radius: 1px;
+}
+
+.planets__structure {
+  position: absolute;
+  z-index: 3;
+  object-fit: contain;
+  background: transparent;
+  pointer-events: none;
+}
+.planets__structure--a {
+  left: -53px;
+  top: 721px;
   width: 265px;
   height: 466px;
 }
-.planet__structure--2 {
-  left: -280px;
-  top: 790px;
+.planets__structure--b {
+  left: 382px;
+  top: 1032px;
   width: 524px;
   height: 361px;
 }
 
-.planet__marker {
+.planets__rocks {
   position: absolute;
-  z-index: 4;
-  width: 28px;
-  height: 28px;
-  margin-left: -14px;
-  margin-top: -14px;
-  border-radius: 50%;
+  left: 929px;
+  top: 1773px;
+  width: 1195px;
+  height: 702px;
+  object-fit: contain;
   background: transparent;
+  transform: rotate(28.58deg);
+  transform-origin: center center;
+  z-index: 3;
   pointer-events: none;
 }
 
+.planets__smoke {
+  position: absolute;
+  z-index: 1;
+  object-fit: cover;
+  opacity: 0.38;
+  pointer-events: none;
+  background: transparent;
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, #000 25%, transparent 78%);
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, #000 25%, transparent 78%);
+}
+.planets__smoke--fornax-a {
+  left: 818px;
+  top: 0;
+  width: 2702px;
+  height: 2513px;
+  transform: rotate(34.65deg);
+  opacity: 0.32;
+}
+.planets__smoke--fornax-b {
+  left: -1105px;
+  top: 26px;
+  width: 2200px;
+  height: 1472px;
+  opacity: 0.3;
+}
+.planets__smoke--perita-a {
+  left: 995px;
+  top: 1376px;
+  width: 2216px;
+  height: 1874px;
+  opacity: 0.34;
+  transform: matrix(-0.93, 0.38, 0.38, 0.93, 0, 0);
+}
+.planets__smoke--perita-b {
+  left: 2701px;
+  top: 1333px;
+  width: 2216px;
+  height: 1874px;
+  opacity: 0.3;
+  transform: matrix(-0.93, 0.38, 0.38, 0.93, 0, 0);
+}
+
+.planet,
+.planet__visual,
+.planet__image,
 .planet__fog,
-.planet__node {
-  display: none !important;
+.planet__node,
+.planet__rocks,
+.planet__structure {
+  /* kept only if referenced elsewhere */
 }
 
 .brysko {
@@ -1676,38 +1719,42 @@ a {
     flex-wrap: wrap;
     gap: 24px;
   }
-  .planet--fornax,
-  .planet--perita {
+  .planets {
     height: auto;
-    margin-top: 40px;
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    padding: 24px 16px 80px;
   }
-  .planet--perita {
-    margin-top: 24px;
-  }
-  .planet__copy,
-  .planet__visual {
+  .planets__fornax-art,
+  .planets__perita-art,
+  .planets__structure,
+  .planets__rocks,
+  .planets__smoke {
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: min(100%, 900px) !important;
+    width: min(100%, 640px) !important;
     height: auto !important;
-    margin: 0 auto 24px !important;
+    transform: none !important;
+    margin: 0 auto;
   }
-  .planet__copy {
-    width: min(100%, 647px) !important;
-    padding: 0 24px;
+  .planets__fornax-planet,
+  .planets__perita-planet {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
   }
-  .planet__image {
-    position: relative;
-    width: 100%;
-    height: auto;
+  .planets__copy {
+    position: relative !important;
     left: auto !important;
-    mask-image: none !important;
+    top: auto !important;
+    width: min(100%, 647px) !important;
+    margin: 0 auto;
+    padding: 0 8px;
   }
-  .planet__structure,
-  .planet__rocks,
-  .planet__fog {
+  .planets__marker {
     display: none;
   }
   .tenno__feature {
@@ -1844,14 +1891,21 @@ a {
 
 .fx-drip {
   position: absolute;
-  width: 2px;
+  width: 1.5px;
   height: 0;
-  margin-left: -1px;
-  background: linear-gradient(180deg, rgba(220, 220, 220, 0.75), rgba(40, 40, 40, 0.05));
+  margin-left: -0.75px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(200, 200, 200, 0.05));
   border-radius: 1px;
-  opacity: 0.85;
+  opacity: 0.9;
   pointer-events: none;
   animation: fx-drip 1.35s ease-in forwards;
+}
+
+.fx-drip--side {
+  width: 1.25px;
+  background: rgba(255, 255, 255, 0.75);
+  animation: fx-drip-side 1.1s ease-in forwards;
+  box-shadow: 0 10px 0 0 rgba(255, 255, 255, 0.45), 0 22px 0 0 rgba(255, 255, 255, 0.28), 0 34px 0 0 rgba(255, 255, 255, 0.12);
 }
 
 .fx-ripple {
@@ -1936,6 +1990,23 @@ a {
     height: 48px;
     opacity: 0;
     transform: translateY(14px);
+  }
+}
+@keyframes fx-drip-side {
+  0% {
+    height: 6px;
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  25% {
+    height: 14px;
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+  100% {
+    height: 28px;
+    opacity: 0;
+    transform: translateY(28px);
   }
 }
 @keyframes fx-ripple {

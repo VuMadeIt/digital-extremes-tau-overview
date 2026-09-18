@@ -72,7 +72,7 @@
 
   gsap.utils.toArray('[data-animate="section"]').forEach((section) => {
     const targets = section.querySelectorAll(
-      '.heading-imbue, .brysko__name, .brysko__role, .tenno__copy h3, .mode-card, .hub-tile, .promo-card, .planet__copy, .qol-card'
+      '.heading-imbue, .brysko__name, .brysko__role, .tenno__copy h3, .mode-card, .hub-tile, .promo-card, .planets__copy, .qol-card'
     );
     if (!targets.length) return;
 
@@ -95,12 +95,12 @@
     );
   });
 
-  gsap.utils.toArray('.planet__image').forEach((img) => {
+  gsap.utils.toArray('.planets__fornax-planet, .planets__perita-planet').forEach((img) => {
     gsap.to(img, {
-      y: -18,
+      y: -14,
       ease: 'none',
       scrollTrigger: {
-        trigger: img.closest('.planet'),
+        trigger: '.planets',
         start: 'top bottom',
         end: 'bottom top',
         scrub: true,
@@ -196,66 +196,65 @@ function initBlackRain(reduceMotion) {
 
   function spawnHit(x, y, kind) {
     const el = document.createElement('span');
-    if (kind === 'drip') el.className = 'fx-drip';
+    if (kind === 'drip') el.className = 'fx-drip fx-drip--side';
     else if (kind === 'ripple') el.className = 'fx-ripple';
-    else el.className = Math.random() > 0.55 ? 'fx-splash fx-splash--wide' : 'fx-splash';
+    else el.className = Math.random() > 0.5 ? 'fx-splash fx-splash--wide' : 'fx-splash';
     el.style.left = `${x}px`;
     el.style.top = `${y}px`;
     hits.appendChild(el);
-    window.setTimeout(() => el.remove(), kind === 'drip' ? 1500 : 700);
+    window.setTimeout(() => el.remove(), kind === 'drip' ? 1600 : 700);
   }
 
-  function splashTargets() {
+  // Only UI borders — never planet/image surfaces
+  function borderTargets() {
     const list = [];
-
-    document.querySelectorAll('[data-rain-marker]').forEach((node) => {
+    document.querySelectorAll('[data-rain-border]').forEach((node) => {
       const rect = node.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top > height) return;
-      list.push({
-        type: 'marker',
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-        dripY: rect.bottom,
-      });
-    });
+      if (rect.bottom < -40 || rect.top > height + 40) return;
 
-    document.querySelectorAll('[data-rain-ledge]').forEach((node) => {
-      const rect = node.getBoundingClientRect();
-      if (rect.bottom < -20 || rect.top > height + 20) return;
-      for (let i = 0; i < 6; i += 1) {
-        const t = (i + 0.2 + Math.random() * 0.5) / 6;
+      // Top edge splash points
+      for (let i = 0; i < 7; i += 1) {
+        const t = (i + 0.25 + Math.random() * 0.4) / 7;
         list.push({
-          type: 'ledge',
+          kind: 'top',
           x: rect.left + rect.width * t,
-          y: rect.top + 3,
-          dripY: rect.top + 8,
+          y: rect.top + 2,
         });
       }
-    });
 
+      // Left / right side drip points (like Figma dashed drips)
+      const sideCount = 4;
+      for (let i = 0; i < sideCount; i += 1) {
+        const t = (i + 0.35 + Math.random() * 0.3) / sideCount;
+        const y = rect.top + rect.height * Math.min(0.92, t);
+        list.push({ kind: 'side', x: rect.left + 2, y });
+        list.push({ kind: 'side', x: rect.right - 2, y });
+      }
+    });
     return list;
   }
 
   function maybeInteract(now) {
-    if (now - lastHit < 100) return;
-    const targets = splashTargets();
+    if (now - lastHit < 120) return;
+    const targets = borderTargets();
     if (!targets.length) return;
 
-    if (Math.random() < 0.5) {
-      const target = targets[Math.floor(Math.random() * targets.length)];
-      spawnHit(target.x + (Math.random() * 6 - 3), target.y, 'splash');
-      if (Math.random() > 0.5) {
-        spawnHit(target.x + (Math.random() * 10 - 5), target.y + 2, 'ripple');
-      }
+    const tops = targets.filter((t) => t.kind === 'top');
+    const sides = targets.filter((t) => t.kind === 'side');
+
+    if (tops.length && Math.random() < 0.55) {
+      const t = tops[Math.floor(Math.random() * tops.length)];
+      spawnHit(t.x + (Math.random() * 4 - 2), t.y, 'splash');
+      if (Math.random() > 0.55) spawnHit(t.x, t.y + 1, 'ripple');
       lastHit = now;
-      if (audio.enabled && Math.random() > 0.65) audio.splash();
+      if (audio.enabled && Math.random() > 0.7) audio.splash();
     }
 
-    if (now - lastDrip > 650 && Math.random() < 0.45) {
-      const target = targets[Math.floor(Math.random() * targets.length)];
-      spawnHit(target.x + (Math.random() * 4 - 2), target.dripY, 'drip');
+    if (sides.length && now - lastDrip > 520 && Math.random() < 0.5) {
+      const t = sides[Math.floor(Math.random() * sides.length)];
+      spawnHit(t.x, t.y, 'drip');
       lastDrip = now;
-      if (audio.enabled && Math.random() > 0.5) audio.drip();
+      if (audio.enabled && Math.random() > 0.6) audio.drip();
     }
   }
 

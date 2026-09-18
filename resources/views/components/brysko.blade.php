@@ -3,7 +3,7 @@
         <img class="brysko__bg" src="<?= e(asset_url('brysko_bg')) ?>" alt="">
         <div class="brysko__scrim"></div>
 
-        <div class="brysko__frame brysko__frame--top" data-rain-ledge aria-hidden="true">
+        <div class="brysko__frame brysko__frame--top" data-rain-border aria-hidden="true">
             <img src="<?= e(asset_url('divider_jagged')) ?>" alt="">
         </div>
         <div class="brysko__frame brysko__frame--bottom" aria-hidden="true">

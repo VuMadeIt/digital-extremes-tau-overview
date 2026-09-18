@@ -44,6 +44,7 @@ return [
     'planet_perita' => 'planet-perita.png',
     'rocks_dust' => 'rocks-dust.png',
     'sentient_structure' => 'sentient-structure.png',
+    'sentient_structure_b' => 'sentient-structure-b.png',
     'brysko_bg' => 'brysko-bg.png',
     'ability_card' => 'ability-card.png',
     'ability_1' => 'ability-1.svg',
