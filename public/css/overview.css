@@ -1587,28 +1587,39 @@ a {
     flex-wrap: wrap;
     gap: 24px;
   }
-  .planet--left,
-  .planet--right {
-    grid-template-columns: 1fr;
-    padding: 40px 24px;
-    min-height: auto;
+  .planet--fornax,
+  .planet--perita {
+    height: auto;
+    margin-top: 40px;
+    width: 100%;
   }
-  .planet--right {
-    margin-top: 0;
+  .planet--perita {
+    margin-top: 24px;
   }
-  .planet--right .planet__copy,
-  .planet--right .planet__visual {
-    order: initial;
-  }
+  .planet__copy,
   .planet__visual {
-    height: 520px;
-    width: 100% !important;
-    margin: 0 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: min(100%, 900px) !important;
+    height: auto !important;
+    margin: 0 auto 24px !important;
+  }
+  .planet__copy {
+    width: min(100%, 647px) !important;
+    padding: 0 24px;
   }
   .planet__image {
+    position: relative;
     width: 100%;
-    left: 50% !important;
+    height: auto;
+    left: auto !important;
     mask-image: none !important;
+  }
+  .planet__structure,
+  .planet__rocks,
+  .planet__fog {
+    display: none;
   }
   .tenno__feature {
     grid-template-columns: 1fr;
