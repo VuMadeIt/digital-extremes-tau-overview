@@ -1,4 +1,4 @@
-<section class="starchart" data-node-id="3694:6782" data-animate="section" data-rain-zone="starchart">
+<section class="starchart" data-node-id="3694:6782" data-animate="section" data-rain-zone="starchart" data-rain-audio-zone>
     <div class="starchart__atmosphere" aria-hidden="true">
         <img class="starchart__wash" src="<?= e(asset_url('section_bg')) ?>" alt="">
         <img class="starchart__rings" src="<?= e(asset_url('rings')) ?>" alt="">
@@ -18,7 +18,7 @@
                 Description of update lorem
             </p>
         </div>
-        <div class="starchart__map" data-rain-surface>
+        <div class="starchart__map" data-rain-ledge>
             <img src="<?= e(asset_url('starchart_map')) ?>" alt="Tau starchart map">
         </div>
     </div>
@@ -33,10 +33,10 @@
                 <div class="planet__copy">
                     <h3 class="heading-imbue heading-imbue--lg"><?= e($planet['name']) ?></h3>
                     <p><?= e($planet['body']) ?></p>
-                    <a class="btn btn--primary" href="#<?= e($planet['id']) ?>"><?= e($planet['cta']) ?></a>
+                    <a class="btn btn--primary planet__cta" href="#<?= e($planet['id']) ?>"><?= e($planet['cta']) ?></a>
                 </div>
 
-                <div class="planet__visual" data-rain-surface>
+                <div class="planet__visual">
                     <img
                         class="planet__image"
                         src="<?= e($planet['image']) ?>"
@@ -64,6 +64,15 @@
                             >
                         <?php endforeach; ?>
                     <?php endif; ?>
+
+                    <?php foreach (($planet['markers'] ?? []) as $marker): ?>
+                        <span
+                            class="planet__marker"
+                            data-rain-marker
+                            style="left: <?= e($marker['x']) ?>%; top: <?= e($marker['y']) ?>%;"
+                            aria-hidden="true"
+                        ></span>
+                    <?php endforeach; ?>
                 </div>
             </article>
         <?php endforeach; ?>

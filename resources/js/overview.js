@@ -108,21 +108,13 @@
     });
   });
 
-  // Subtle fog / smoke sway
   gsap.utils.toArray('[data-fog], .fog-sway').forEach((fog, i) => {
     const dir = i % 2 === 0 ? 1 : -1;
     gsap.to(fog, {
-      x: 36 * dir,
-      y: 18 * dir,
-      rotation: 2.2 * dir,
-      duration: 14 + (i % 4) * 2.5,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-    });
-    gsap.to(fog, {
-      opacity: Number.parseFloat(getComputedStyle(fog).opacity || '0.35') * 0.82,
-      duration: 9 + i,
+      x: 28 * dir,
+      y: 14 * dir,
+      rotation: 1.6 * dir,
+      duration: 16 + (i % 4) * 2.5,
       ease: 'sine.inOut',
       yoyo: true,
       repeat: -1,
@@ -152,6 +144,7 @@ function initBlackRain(reduceMotion) {
   let lastHit = 0;
   let lastDrip = 0;
   let raf = 0;
+  let userMuted = false;
 
   const audio = createRainAudio();
 
@@ -167,19 +160,19 @@ function initBlackRain(reduceMotion) {
   }
 
   function seedDrops() {
-    const count = Math.min(90, Math.floor(width / 16));
+    const count = Math.min(110, Math.floor(width / 14));
     drops = Array.from({ length: count }, () => makeDrop(true));
-    heavies = Array.from({ length: 5 }, () => makeHeavy(true));
+    heavies = Array.from({ length: 6 }, () => makeHeavy(true));
   }
 
   function makeDrop(randomY) {
     return {
       x: Math.random() * width,
-      y: randomY ? Math.random() * height : -20 - Math.random() * 80,
-      len: 8 + Math.random() * 12,
-      speed: 11 + Math.random() * 12,
-      alpha: 0.06 + Math.random() * 0.1,
-      width: 0.55 + Math.random() * 0.45,
+      y: randomY ? Math.random() * height : -24 - Math.random() * 90,
+      len: 9 + Math.random() * 14,
+      speed: 12 + Math.random() * 14,
+      alpha: 0.07 + Math.random() * 0.12,
+      width: 0.55 + Math.random() * 0.5,
     };
   }
 
@@ -187,10 +180,10 @@ function initBlackRain(reduceMotion) {
     return {
       x: Math.random() * width,
       y: randomY ? Math.random() * height : -40,
-      len: 14 + Math.random() * 16,
-      speed: 15 + Math.random() * 12,
-      alpha: 0.1 + Math.random() * 0.12,
-      width: 0.85 + Math.random() * 0.6,
+      len: 16 + Math.random() * 18,
+      speed: 16 + Math.random() * 14,
+      alpha: 0.12 + Math.random() * 0.14,
+      width: 0.9 + Math.random() * 0.7,
     };
   }
 
@@ -201,64 +194,68 @@ function initBlackRain(reduceMotion) {
     });
   }
 
-  function inBrysko() {
-    const brysko = document.querySelector('.brysko');
-    if (!brysko) return false;
-    const rect = brysko.getBoundingClientRect();
-    return rect.top < height * 0.55 && rect.bottom > height * 0.35;
-  }
-
   function spawnHit(x, y, kind) {
     const el = document.createElement('span');
-    el.className = kind === 'drip' ? 'fx-drip' : kind === 'ripple' ? 'fx-ripple' : 'fx-splash';
+    if (kind === 'drip') el.className = 'fx-drip';
+    else if (kind === 'ripple') el.className = 'fx-ripple';
+    else el.className = Math.random() > 0.55 ? 'fx-splash fx-splash--wide' : 'fx-splash';
     el.style.left = `${x}px`;
     el.style.top = `${y}px`;
     hits.appendChild(el);
-    window.setTimeout(() => el.remove(), kind === 'drip' ? 1500 : 800);
+    window.setTimeout(() => el.remove(), kind === 'drip' ? 1500 : 700);
   }
 
-  function surfaceTops() {
-    // Prefer surfaces inside rain zones; never hit Brysko frames/UI
-    const zones = activeRainZones();
-    const scope = zones.length
-      ? zones.flatMap((z) => Array.from(z.querySelectorAll('[data-rain-surface], .mode-card, .starchart__map, .planet__image, .qol-card')))
-      : [];
-    const nodes = scope.length
-      ? scope
-      : document.querySelectorAll('[data-rain-surface], .mode-card, .starchart__map, .hub-tile, .promo-card');
+  function splashTargets() {
     const list = [];
-    nodes.forEach((node) => {
-      if (node.closest('.brysko')) return;
+
+    document.querySelectorAll('[data-rain-marker]').forEach((node) => {
       const rect = node.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top > height || rect.width < 40) return;
-      list.push(rect);
+      if (rect.bottom < 0 || rect.top > height) return;
+      list.push({
+        type: 'marker',
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+        dripY: rect.bottom,
+      });
     });
+
+    document.querySelectorAll('[data-rain-ledge]').forEach((node) => {
+      const rect = node.getBoundingClientRect();
+      if (rect.bottom < -20 || rect.top > height + 20) return;
+      for (let i = 0; i < 6; i += 1) {
+        const t = (i + 0.2 + Math.random() * 0.5) / 6;
+        list.push({
+          type: 'ledge',
+          x: rect.left + rect.width * t,
+          y: rect.top + 3,
+          dripY: rect.top + 8,
+        });
+      }
+    });
+
     return list;
   }
 
   function maybeInteract(now) {
-    if (inBrysko()) return;
-    if (!activeRainZones().length) return;
-    if (now - lastHit < 160) return;
-    const surfaces = surfaceTops();
-    if (!surfaces.length) return;
+    if (now - lastHit < 100) return;
+    const targets = splashTargets();
+    if (!targets.length) return;
 
-    if (Math.random() < 0.28) {
-      const rect = surfaces[Math.floor(Math.random() * surfaces.length)];
-      const x = rect.left + Math.random() * rect.width;
-      const y = rect.top + 1 + Math.random() * 3;
-      spawnHit(x, y, Math.random() > 0.75 ? 'ripple' : 'splash');
+    if (Math.random() < 0.5) {
+      const target = targets[Math.floor(Math.random() * targets.length)];
+      spawnHit(target.x + (Math.random() * 6 - 3), target.y, 'splash');
+      if (Math.random() > 0.5) {
+        spawnHit(target.x + (Math.random() * 10 - 5), target.y + 2, 'ripple');
+      }
       lastHit = now;
-      if (audio.enabled && Math.random() > 0.8) audio.splash();
+      if (audio.enabled && Math.random() > 0.65) audio.splash();
     }
 
-    if (now - lastDrip > 1400 && Math.random() < 0.22) {
-      const rect = surfaces[Math.floor(Math.random() * surfaces.length)];
-      const x = rect.left + 20 + Math.random() * Math.max(20, rect.width - 40);
-      const y = rect.bottom - 2;
-      spawnHit(x, y, 'drip');
+    if (now - lastDrip > 650 && Math.random() < 0.45) {
+      const target = targets[Math.floor(Math.random() * targets.length)];
+      spawnHit(target.x + (Math.random() * 4 - 2), target.dripY, 'drip');
       lastDrip = now;
-      if (audio.enabled) audio.drip();
+      if (audio.enabled && Math.random() > 0.5) audio.drip();
     }
   }
 
@@ -266,52 +263,88 @@ function initBlackRain(reduceMotion) {
     ctx.clearRect(0, 0, width, height);
 
     const zonesOn = activeRainZones().length > 0;
-    const bryskoFocus = inBrysko();
-    // Mute canvas rain while Brysko is the focus; keep starchart/tenno subtle
-    const fade = bryskoFocus ? 0.08 : zonesOn ? 0.42 : 0.22;
-    canvas.style.opacity = String(fade);
+    canvas.style.opacity = zonesOn ? '0.5' : '0.22';
 
-    if (!bryskoFocus) {
-      for (let i = 0; i < drops.length; i += 1) {
-        const d = drops[i];
-        d.y += d.speed;
-        d.x += 0.12;
-        if (d.y > height + 20) drops[i] = makeDrop(false);
-        ctx.strokeStyle = `rgba(12, 12, 12, ${d.alpha})`;
-        ctx.lineWidth = d.width;
-        ctx.beginPath();
-        ctx.moveTo(d.x, d.y);
-        ctx.lineTo(d.x - 0.35, d.y + d.len);
-        ctx.stroke();
-      }
-
-      for (let i = 0; i < heavies.length; i += 1) {
-        const d = heavies[i];
-        d.y += d.speed;
-        if (d.y > height + 30) heavies[i] = makeHeavy(false);
-        ctx.strokeStyle = `rgba(6, 6, 6, ${d.alpha})`;
-        ctx.lineWidth = d.width;
-        ctx.beginPath();
-        ctx.moveTo(d.x, d.y);
-        ctx.lineTo(d.x - 0.55, d.y + d.len);
-        ctx.stroke();
-      }
-
-      maybeInteract(now || performance.now());
+    // Straight vertical rain only
+    for (let i = 0; i < drops.length; i += 1) {
+      const d = drops[i];
+      d.y += d.speed;
+      if (d.y > height + 24) drops[i] = makeDrop(false);
+      ctx.strokeStyle = `rgba(10, 10, 10, ${d.alpha})`;
+      ctx.lineWidth = d.width;
+      ctx.beginPath();
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x, d.y + d.len);
+      ctx.stroke();
     }
 
+    for (let i = 0; i < heavies.length; i += 1) {
+      const d = heavies[i];
+      d.y += d.speed;
+      if (d.y > height + 30) heavies[i] = makeHeavy(false);
+      ctx.strokeStyle = `rgba(5, 5, 5, ${d.alpha})`;
+      ctx.lineWidth = d.width;
+      ctx.beginPath();
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x, d.y + d.len);
+      ctx.stroke();
+    }
+
+    maybeInteract(now || performance.now());
     raf = window.requestAnimationFrame(tick);
+  }
+
+  function syncAudioBtn() {
+    if (!audioBtn) return;
+    audioBtn.setAttribute('aria-pressed', String(audio.enabled));
+    audioBtn.textContent = audio.enabled ? 'Rain audio on' : 'Rain audio off';
   }
 
   resize();
   window.addEventListener('resize', resize, { passive: true });
   raf = window.requestAnimationFrame(tick);
 
+  // Autoplay rain audio when Tau's Starchart scrolls into view
+  const audioZone = document.querySelector('[data-rain-audio-zone]');
+  if (audioZone && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(async (entry) => {
+          if (userMuted) return;
+          if (entry.isIntersecting) {
+            const ok = await audio.setEnabled(true);
+            if (ok) syncAudioBtn();
+          } else if (audio.enabled) {
+            await audio.setEnabled(false);
+            syncAudioBtn();
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -8% 0px' }
+    );
+    io.observe(audioZone);
+
+    // Browsers often require one gesture before AudioContext starts —
+    // unlock on first scroll/pointer once starchart is near.
+    const unlock = async () => {
+      if (userMuted) return;
+      const rect = audioZone.getBoundingClientRect();
+      const near = rect.top < window.innerHeight && rect.bottom > 0;
+      if (near) {
+        await audio.setEnabled(true);
+        syncAudioBtn();
+      }
+    };
+    window.addEventListener('pointerdown', unlock, { once: true, passive: true });
+    window.addEventListener('wheel', unlock, { once: true, passive: true });
+    window.addEventListener('touchstart', unlock, { once: true, passive: true });
+  }
+
   if (audioBtn) {
     audioBtn.addEventListener('click', async () => {
       const on = await audio.toggle();
-      audioBtn.setAttribute('aria-pressed', String(on));
-      audioBtn.textContent = on ? 'Rain audio on' : 'Rain audio off';
+      userMuted = !on;
+      syncAudioBtn();
     });
   }
 
@@ -329,7 +362,6 @@ function initBlackRain(reduceMotion) {
 function createRainAudio() {
   let ctx = null;
   let rainGain = null;
-  let noiseNode = null;
   let enabled = false;
 
   async function ensure() {
@@ -338,7 +370,7 @@ function createRainAudio() {
     if (!AC) return;
     ctx = new AC();
     rainGain = ctx.createGain();
-    rainGain.gain.value = 0.028;
+    rainGain.gain.value = 0;
     rainGain.connect(ctx.destination);
 
     const bufferSize = 2 * ctx.sampleRate;
@@ -346,7 +378,7 @@ function createRainAudio() {
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i += 1) data[i] = Math.random() * 2 - 1;
 
-    noiseNode = ctx.createBufferSource();
+    const noiseNode = ctx.createBufferSource();
     noiseNode.buffer = buffer;
     noiseNode.loop = true;
 
@@ -366,7 +398,6 @@ function createRainAudio() {
     const gain = ctx.createGain();
     osc.type = 'sine';
     osc.frequency.value = freq;
-    gain.gain.value = volume;
     osc.connect(gain);
     gain.connect(ctx.destination);
     const t = ctx.currentTime;
@@ -380,17 +411,20 @@ function createRainAudio() {
     get enabled() {
       return enabled;
     },
-    async toggle() {
+    async setEnabled(on) {
       await ensure();
       if (!ctx) return false;
-      enabled = !enabled;
-      if (enabled) {
-        if (ctx.state === 'suspended') await ctx.resume();
-        rainGain.gain.value = 0.028;
-      } else if (rainGain) {
-        rainGain.gain.value = 0;
+      try {
+        if (on && ctx.state === 'suspended') await ctx.resume();
+      } catch (_) {
+        return false;
       }
+      enabled = Boolean(on);
+      if (rainGain) rainGain.gain.value = enabled ? 0.03 : 0;
       return enabled;
+    },
+    async toggle() {
+      return this.setEnabled(!enabled);
     },
     splash() {
       blip(180 + Math.random() * 90, 0.08, 0.012);

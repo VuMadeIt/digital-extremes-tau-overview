@@ -68,6 +68,12 @@ class OverviewController
                         asset_url('sentient_structure'),
                         asset_url('sentient_structure'),
                     ],
+                    'markers' => [
+                        ['x' => 18, 'y' => 22],
+                        ['x' => 8, 'y' => 42],
+                        ['x' => 38, 'y' => 68],
+                        ['x' => 52, 'y' => 82],
+                    ],
                 ],
                 [
                     'id' => 'perita',
@@ -79,6 +85,12 @@ class OverviewController
                     'imgW' => 1132,
                     'imgH' => 1567,
                     'rocks' => asset_url('rocks_dust'),
+                    'markers' => [
+                        ['x' => 48, 'y' => 28],
+                        ['x' => 62, 'y' => 42],
+                        ['x' => 38, 'y' => 58],
+                        ['x' => 52, 'y' => 74],
+                    ],
                 ],
             ],
             'abilities' => [
