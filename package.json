@@ -1,0 +1,16 @@
+{
+  "name": "tau-mafia-overview-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Laravel/Blade prototype of Figma Overview Page (WF-2026 Tau Mafia Hubsite)",
+  "scripts": {
+    "build:css": "sass resources/scss/overview.scss public/css/overview.css --no-source-map",
+    "build:js": "node -e \"require('fs').copyFileSync('resources/js/overview.js','public/js/overview.js')\"",
+    "build": "npm run build:css && npm run build:js",
+    "serve": "npm run build && node server.mjs",
+    "php": "tools/php/php.exe -S localhost:8080 -t public"
+  },
+  "devDependencies": {
+    "sass": "^1.77.0"
+  }
+}
