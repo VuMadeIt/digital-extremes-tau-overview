@@ -1,5 +1,11 @@
 <section class="soundtrack" data-node-id="3693:6603" data-animate="section">
-    <img class="soundtrack__bg" src="<?= e(asset_url('soundtrack_bg')) ?>" alt="">
+    <div class="soundtrack__atmosphere" aria-hidden="true">
+        <img class="soundtrack__bg" src="<?= e(asset_url('soundtrack_bg')) ?>" alt="">
+        <img class="soundtrack__fog soundtrack__fog--a fog-sway" src="<?= e(asset_url('smoke')) ?>" alt="" data-fog>
+        <img class="soundtrack__fog soundtrack__fog--b fog-sway" src="<?= e(asset_url('smoke')) ?>" alt="" data-fog>
+        <img class="soundtrack__fog soundtrack__fog--c fog-sway" src="<?= e(asset_url('smoke')) ?>" alt="" data-fog>
+        <img class="soundtrack__fog soundtrack__fog--d fog-sway" src="<?= e(asset_url('smoke')) ?>" alt="" data-fog>
+    </div>
 
     <div class="soundtrack__card" style="--noise: url('<?= e(asset_url('noise')) ?>')">
         <div class="soundtrack__top">
@@ -9,7 +15,6 @@
             </h2>
 
             <div class="soundtrack__covers">
-                {{-- Vinyl sits behind and peeks right of album (Figma: vinyl @ +98.74px, album @ 0) --}}
                 <img
                     class="soundtrack__vinyl"
                     src="<?= e(asset_url('soundtrack_vinyl')) ?>"

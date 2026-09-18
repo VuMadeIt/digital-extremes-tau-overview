@@ -108,13 +108,18 @@
     });
   });
 
+  // Fog: mostly side-to-side sway; rotation capped well under 10°; 70% slower
   gsap.utils.toArray('[data-fog], .fog-sway').forEach((fog, i) => {
     const dir = i % 2 === 0 ? 1 : -1;
+    const flip =
+      fog.classList.contains('planets__smoke--fornax-b') ||
+      fog.classList.contains('planets__smoke--perita-b');
+    gsap.set(fog, { scaleX: flip ? -1 : 1, rotation: 0 });
     gsap.to(fog, {
-      x: 28 * dir,
-      y: 14 * dir,
-      rotation: 1.6 * dir,
-      duration: 16 + (i % 4) * 2.5,
+      x: 14 * dir,
+      y: 1.5 * dir,
+      rotation: 2.2 * dir,
+      duration: (22 + (i % 4) * 4) / 0.3,
       ease: 'sine.inOut',
       yoyo: true,
       repeat: -1,
@@ -122,12 +127,15 @@
   });
 })();
 
+/**
+ * Sheepeuh-style canvas rain — black, long/thin streaks + surface splashes.
+ * Adapted from http://sheepeuh.com/rain/ (no GUI / toys).
+ */
 function initBlackRain(reduceMotion) {
   const root = document.querySelector('[data-fx-rain]');
   const canvas = document.querySelector('[data-rain-canvas]');
-  const hits = document.querySelector('[data-rain-hits]');
   const audioBtn = document.querySelector('[data-rain-audio-toggle]');
-  if (!root || !canvas || !hits) return;
+  if (!root || !canvas) return;
 
   if (reduceMotion) {
     root.hidden = true;
@@ -139,12 +147,22 @@ function initBlackRain(reduceMotion) {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   let width = 0;
   let height = 0;
-  let drops = [];
-  let heavies = [];
-  let lastHit = 0;
-  let lastDrip = 0;
+  let particules = [];
+  let gouttes = [];
   let raf = 0;
   let userMuted = false;
+  let surfaceCache = [];
+  let surfaceCacheAt = 0;
+
+  // Tuned black rain — longer + thinner than demo defaults
+  const controls = {
+    rain: 3, // spawn burst size per frame
+    dropMin: 18,
+    dropMax: 42,
+    dropWidthDiv: 8.5, // vitesseY / this = streak width (thinner)
+    speedBoost: 5,
+    splashCount: 6,
+  };
 
   const audio = createRainAudio();
 
@@ -156,140 +174,343 @@ function initBlackRain(reduceMotion) {
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    seedDrops();
+    surfaceCacheAt = 0;
   }
 
-  function seedDrops() {
-    const count = Math.min(110, Math.floor(width / 14));
-    drops = Array.from({ length: count }, () => makeDrop(true));
-    heavies = Array.from({ length: 6 }, () => makeHeavy(true));
+  function rainColor(alpha) {
+    return `rgba(0, 0, 0, ${alpha})`;
   }
 
-  function makeDrop(randomY) {
-    return {
-      x: Math.random() * width,
-      y: randomY ? Math.random() * height : -24 - Math.random() * 90,
-      len: 9 + Math.random() * 14,
-      speed: 12 + Math.random() * 14,
-      alpha: 0.07 + Math.random() * 0.12,
-      width: 0.55 + Math.random() * 0.5,
-    };
+  function spawnRain(x, y, count) {
+    let n = count == null ? 2 : count;
+    while (n--) {
+      const vitesseY = controls.dropMin + Math.random() * (controls.dropMax - controls.dropMin);
+      particules.push({
+        vitesseX: Math.random() * 0.2 - 0.05,
+        vitesseY,
+        x,
+        y,
+        alpha: 0.55 + Math.random() * 0.4,
+      });
+    }
   }
 
-  function makeHeavy(randomY) {
-    return {
-      x: Math.random() * width,
-      y: randomY ? Math.random() * height : -40,
-      len: 16 + Math.random() * 18,
-      speed: 16 + Math.random() * 14,
-      alpha: 0.12 + Math.random() * 0.14,
-      width: 0.9 + Math.random() * 0.7,
-    };
+  const tipCache = new Map();
+  const silhouetteCache = new Map();
+
+  async function loadJson(url) {
+    if (!url) return null;
+    if (tipCache.has(url)) return tipCache.get(url);
+    try {
+      const res = await fetch(url, { cache: 'force-cache' });
+      const data = await res.json();
+      tipCache.set(url, data);
+      return data;
+    } catch (_) {
+      tipCache.set(url, null);
+      return null;
+    }
   }
 
-  function activeRainZones() {
-    return Array.from(document.querySelectorAll('[data-rain-zone]')).filter((zone) => {
-      const rect = zone.getBoundingClientRect();
-      return rect.bottom > 80 && rect.top < height - 80;
-    });
+  async function loadSilhouette(url) {
+    if (!url) return null;
+    if (silhouetteCache.has(url)) return silhouetteCache.get(url);
+    const data = await loadJson(url);
+    silhouetteCache.set(url, data);
+    return data;
   }
 
-  function spawnHit(x, y, kind) {
-    const el = document.createElement('span');
-    if (kind === 'drip') el.className = 'fx-drip fx-drip--side';
-    else if (kind === 'ripple') el.className = 'fx-ripple';
-    else el.className = Math.random() > 0.5 ? 'fx-splash fx-splash--wide' : 'fx-splash';
-    el.style.left = `${x}px`;
-    el.style.top = `${y}px`;
-    hits.appendChild(el);
-    window.setTimeout(() => el.remove(), kind === 'drip' ? 1600 : 700);
+  function collectRainZones() {
+    return Array.from(document.querySelectorAll('[data-rain-zone]')).map((zone) =>
+      zone.getBoundingClientRect()
+    );
   }
 
-  // Only UI borders — never planet/image surfaces
-  function borderTargets() {
+  function zoneRects() {
+    return collectRainZones().filter((r) => r.width > 0 && r.height > 0);
+  }
+
+  function anyZoneVisible(rects) {
+    return rects.some((r) => r.bottom > 0 && r.top < height);
+  }
+
+  function pointInZones(x, y, rects) {
+    for (let i = 0; i < rects.length; i += 1) {
+      const r = rects[i];
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return true;
+    }
+    return false;
+  }
+
+  function collectSurfaces() {
     const list = [];
-    document.querySelectorAll('[data-rain-border]').forEach((node) => {
+    document.querySelectorAll('[data-rain-surface], [data-rain-border]').forEach((node) => {
+      // Only splash inside active rain sections (Starchart / Tenno)
+      if (!node.closest('[data-rain-zone]')) return;
+
       const rect = node.getBoundingClientRect();
       if (rect.bottom < -40 || rect.top > height + 40) return;
+      if (rect.width < 8 || rect.height < 2) return;
 
-      // Top edge splash points
-      for (let i = 0; i < 7; i += 1) {
-        const t = (i + 0.25 + Math.random() * 0.4) / 7;
-        list.push({
-          kind: 'top',
-          x: rect.left + rect.width * t,
-          y: rect.top + 2,
-        });
-      }
+      const shingles = node.hasAttribute('data-rain-shingles');
+      const silUrl = node.getAttribute('data-rain-silhouette') || '';
+      const sil = silUrl ? silhouetteCache.get(silUrl) : null;
+      const edge = node.getAttribute('data-rain-edge') || (sil && sil.edge) || 'top';
 
-      // Left / right side drip points (like Figma dashed drips)
-      const sideCount = 4;
-      for (let i = 0; i < sideCount; i += 1) {
-        const t = (i + 0.35 + Math.random() * 0.3) / sideCount;
-        const y = rect.top + rect.height * Math.min(0.92, t);
-        list.push({ kind: 'side', x: rect.left + 2, y });
-        list.push({ kind: 'side', x: rect.right - 2, y });
-      }
+      list.push({
+        node,
+        rect,
+        shingles,
+        sil,
+        edge,
+        x0: rect.left,
+        x1: rect.right,
+        yHit: rect.top + 2,
+      });
     });
     return list;
   }
 
-  function maybeInteract(now) {
-    if (now - lastHit < 120) return;
-    const targets = borderTargets();
-    if (!targets.length) return;
-
-    const tops = targets.filter((t) => t.kind === 'top');
-    const sides = targets.filter((t) => t.kind === 'side');
-
-    if (tops.length && Math.random() < 0.55) {
-      const t = tops[Math.floor(Math.random() * tops.length)];
-      spawnHit(t.x + (Math.random() * 4 - 2), t.y, 'splash');
-      if (Math.random() > 0.55) spawnHit(t.x, t.y + 1, 'ripple');
-      lastHit = now;
-      if (audio.enabled && Math.random() > 0.7) audio.splash();
+  function surfaces() {
+    const now = performance.now();
+    if (now - surfaceCacheAt > 100) {
+      surfaceCache = collectSurfaces();
+      surfaceCacheAt = now;
     }
+    return surfaceCache;
+  }
 
-    if (sides.length && now - lastDrip > 520 && Math.random() < 0.5) {
-      const t = sides[Math.floor(Math.random() * sides.length)];
-      spawnHit(t.x, t.y, 'drip');
-      lastDrip = now;
-      if (audio.enabled && Math.random() > 0.6) audio.drip();
+  /** Screen Y of opaque shingle edge at this screen X (silhouette, not box). */
+  function silhouetteY(surf, screenX) {
+    const { rect, sil, edge } = surf;
+    if (!sil || !sil.heights || !sil.heights.length) {
+      return edge === 'bottom' ? rect.bottom - 2 : rect.top + 2;
+    }
+    const u = (screenX - rect.left) / rect.width;
+    if (u < 0 || u > 1) return null;
+    const idx = Math.min(
+      sil.heights.length - 1,
+      Math.max(0, Math.floor(u * sil.heights.length))
+    );
+    let ny = sil.heights[idx];
+    // Flipped bottom divider: map tip edge to bottom of element
+    if (edge === 'bottom') {
+      return rect.top + (1 - ny) * rect.height;
+    }
+    return rect.top + ny * rect.height;
+  }
+
+  function nearestTip(surf, screenX) {
+    const sil = surf.sil;
+    if (!sil || !sil.tips || !sil.tips.length) return null;
+    const { rect } = surf;
+    let best = null;
+    let bestD = Infinity;
+    for (let i = 0; i < sil.tips.length; i += 1) {
+      const t = sil.tips[i];
+      const tx = rect.left + t.x * rect.width;
+      const d = Math.abs(tx - screenX);
+      if (d < bestD) {
+        bestD = d;
+        best = {
+          x: tx,
+          y: rect.top + t.y * rect.height,
+          d: bestD,
+        };
+      }
+    }
+    return best;
+  }
+
+  function hitSurface(drop) {
+    const list = surfaces();
+    const tipY = drop.y + drop.vitesseY * 1.15;
+
+    for (let s = 0; s < list.length; s += 1) {
+      const surf = list[s];
+      if (drop.x < surf.x0 - 4 || drop.x > surf.x1 + 4) continue;
+
+      if (surf.shingles && surf.sil) {
+        const edgeY = silhouetteY(surf, drop.x);
+        if (edgeY == null) continue;
+
+        // Hit the painted shingle contour (not the image box)
+        if (tipY >= edgeY && drop.y <= edgeY + 28) {
+          const tip = nearestTip(surf, drop.x);
+          // Prefer snap to tip when close — rain "flows" to points
+          if (tip && tip.d < 36) {
+            return {
+              x: tip.x,
+              y: tip.y,
+              flow: true,
+              slope: edgeY - tip.y,
+            };
+          }
+          // Hit angled face — bounce with slight slide toward nearest tip
+          let hx = drop.x;
+          let hy = edgeY;
+          if (tip) {
+            hx += (tip.x - drop.x) * 0.35;
+            hy = silhouetteY(surf, hx) ?? edgeY;
+          }
+          return { x: hx, y: hy, flow: false };
+        }
+      } else {
+        // Flat UI surface (ability card top, etc.)
+        if (tipY >= surf.yHit && drop.y <= surf.yHit + 16) {
+          return { x: drop.x, y: surf.yHit };
+        }
+      }
+    }
+    return null;
+  }
+
+  function explosion(x, y, count, opts) {
+    let n = count == null ? controls.splashCount : count;
+    const outward = opts && opts.flow ? 1.35 : 1;
+    while (n--) {
+      gouttes.push({
+        vitesseX: (Math.random() * 3.2 - 1.6) * outward,
+        vitesseY: (Math.random() * -3.4 - 0.5) * (opts && opts.flow ? 1.15 : 1),
+        x,
+        y,
+        radius: 0.45 + Math.random() * 1.15,
+        alpha: 0.85 + Math.random() * 0.15,
+      });
     }
   }
 
-  function tick(now) {
+  function update() {
+    const zones = zoneRects();
+    const zonesOn = anyZoneVisible(zones);
+
+    // Fully hide canvas rain outside Starchart / Tenno
+    canvas.style.opacity = zonesOn ? '0.85' : '0';
+    if (!zonesOn) {
+      particules.length = 0;
+      gouttes.length = 0;
+      return;
+    }
+
+    for (let i = 0; i < particules.length; i += 1) {
+      const p = particules[i];
+      p.x += p.vitesseX;
+      p.y += p.vitesseY + controls.speedBoost;
+
+      // Cull drops that leave the allowed sections
+      if (!pointInZones(p.x, p.y, zones) && p.y > 0) {
+        // Allow a short fall-in from above a zone, else remove
+        const aboveZone = zones.some(
+          (r) => p.x >= r.left && p.x <= r.right && p.y < r.top && p.y > r.top - 80
+        );
+        if (!aboveZone) {
+          particules.splice(i--, 1);
+          continue;
+        }
+      }
+
+      const hit = hitSurface(p);
+      if (hit) {
+        explosion(hit.x, hit.y, hit.flow ? 7 : 5, { flow: hit.flow });
+        particules.splice(i--, 1);
+        if (audio.enabled && Math.random() > 0.72) audio.splash();
+        continue;
+      }
+
+      if (p.y > height - 12) {
+        explosion(p.x, height - 8, 3);
+        particules.splice(i--, 1);
+      }
+    }
+
+    for (let i = 0; i < gouttes.length; i += 1) {
+      const g = gouttes[i];
+      g.x += g.vitesseX;
+      g.y += g.vitesseY;
+      g.vitesseY += 0.12; // gravity on splash droplets
+      g.radius -= 0.055;
+      g.alpha -= 0.012;
+      if (g.radius < 0 || g.alpha <= 0) {
+        gouttes.splice(i--, 1);
+      }
+    }
+
+    // Spawn only across visible rain-zone widths
+    let n = controls.rain;
+    while (n--) {
+      const visible = zones.filter((r) => r.bottom > 0 && r.top < height);
+      if (!visible.length) break;
+      const r = visible[Math.floor(Math.random() * visible.length)];
+      const x = r.left + Math.random() * Math.max(1, r.width);
+      const y = Math.min(r.top, 0) - 20 - Math.random() * 40;
+      spawnRain(x, y, 1);
+    }
+  }
+
+  function occluderRects() {
+    const sel =
+      '.promo-card, .mode-card, .starchart__map, .hub-tile, .qol-card, .planets__fornax-art, .planets__perita-art, .planets__fornax-planet, .planets__perita-planet, .planets__copy, .planets__structure, .planets__rocks, .tenno__visual, .tenno__copy, .tenno__inner > .heading-imbue, .brysko__content, .ability-panel, .soundtrack__card, .update-summary__cards, .update-summary__copy';
+    const list = [];
+    document.querySelectorAll(sel).forEach((node) => {
+      const rect = node.getBoundingClientRect();
+      if (rect.width < 4 || rect.height < 4) return;
+      if (rect.bottom < -20 || rect.top > height + 20) return;
+      // Slight pad so streaks don't kiss the edge of images
+      list.push({
+        left: rect.left - 4,
+        top: rect.top - 4,
+        width: rect.width + 8,
+        height: rect.height + 8,
+      });
+    });
+    return list;
+  }
+
+  function render() {
     ctx.clearRect(0, 0, width, height);
 
-    const zonesOn = activeRainZones().length > 0;
-    canvas.style.opacity = zonesOn ? '0.5' : '0.22';
+    const zones = zoneRects();
+    if (!zones.length) return;
 
-    // Straight vertical rain only
-    for (let i = 0; i < drops.length; i += 1) {
-      const d = drops[i];
-      d.y += d.speed;
-      if (d.y > height + 24) drops[i] = makeDrop(false);
-      ctx.strokeStyle = `rgba(10, 10, 10, ${d.alpha})`;
-      ctx.lineWidth = d.width;
-      ctx.beginPath();
-      ctx.moveTo(d.x, d.y);
-      ctx.lineTo(d.x, d.y + d.len);
-      ctx.stroke();
+    ctx.save();
+    ctx.beginPath();
+    zones.forEach((r) => {
+      ctx.rect(r.left, r.top, r.width, r.height);
+    });
+    ctx.clip();
+
+    for (let i = 0; i < particules.length; i += 1) {
+      const p = particules[i];
+      const streakW = Math.max(0.45, p.vitesseY / controls.dropWidthDiv);
+      const streakH = p.vitesseY * 1.35; // longer drops
+      ctx.globalAlpha = p.alpha * 0.92;
+      ctx.fillStyle = rainColor(1);
+      ctx.fillRect(p.x, p.y, streakW, streakH);
     }
 
-    for (let i = 0; i < heavies.length; i += 1) {
-      const d = heavies[i];
-      d.y += d.speed;
-      if (d.y > height + 30) heavies[i] = makeHeavy(false);
-      ctx.strokeStyle = `rgba(5, 5, 5, ${d.alpha})`;
-      ctx.lineWidth = d.width;
+    const tau = Math.PI * 2;
+    for (let i = 0; i < gouttes.length; i += 1) {
+      const g = gouttes[i];
+      ctx.globalAlpha = g.alpha;
+      ctx.fillStyle = rainColor(1);
       ctx.beginPath();
-      ctx.moveTo(d.x, d.y);
-      ctx.lineTo(d.x, d.y + d.len);
-      ctx.stroke();
+      ctx.arc(g.x, g.y, g.radius, 0, tau);
+      ctx.fill();
     }
 
-    maybeInteract(now || performance.now());
+    ctx.globalAlpha = 1;
+
+    // Punch rain out of images / components so streaks never sit on top of UI
+    occluderRects().forEach((r) => {
+      ctx.clearRect(r.left, r.top, r.width, r.height);
+    });
+
+    ctx.restore();
+  }
+
+  function tick() {
+    update();
+    render();
     raf = window.requestAnimationFrame(tick);
   }
 
@@ -301,9 +522,21 @@ function initBlackRain(reduceMotion) {
 
   resize();
   window.addEventListener('resize', resize, { passive: true });
+  window.addEventListener(
+    'scroll',
+    () => {
+      surfaceCacheAt = 0;
+    },
+    { passive: true }
+  );
+
+  // Preload shingle silhouette maps so rain hits the painted edge, not the box
+  document.querySelectorAll('[data-rain-silhouette]').forEach((node) => {
+    loadSilhouette(node.getAttribute('data-rain-silhouette'));
+  });
+
   raf = window.requestAnimationFrame(tick);
 
-  // Autoplay rain audio when Tau's Starchart scrolls into view
   const audioZone = document.querySelector('[data-rain-audio-zone]');
   if (audioZone && 'IntersectionObserver' in window) {
     const io = new IntersectionObserver(
@@ -323,13 +556,10 @@ function initBlackRain(reduceMotion) {
     );
     io.observe(audioZone);
 
-    // Browsers often require one gesture before AudioContext starts —
-    // unlock on first scroll/pointer once starchart is near.
     const unlock = async () => {
       if (userMuted) return;
       const rect = audioZone.getBoundingClientRect();
-      const near = rect.top < window.innerHeight && rect.bottom > 0;
-      if (near) {
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
         await audio.setEnabled(true);
         syncAudioBtn();
       }

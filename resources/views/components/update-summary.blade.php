@@ -1,5 +1,6 @@
 <section class="update-summary" data-node-id="3694:6781" data-animate="section">
     <div class="update-summary__stage">
+        <?php /* Cinematic art extends through cards + divider spikes (masked) */ ?>
         <img class="update-summary__bg" src="<?= e(asset_url('update_summary_bg')) ?>" alt="">
         <div class="update-summary__shade"></div>
 
@@ -15,11 +16,19 @@
             </p>
         </div>
 
-        <div class="update-summary__divider" aria-hidden="true">
-            <img src="<?= e(asset_url('divider_bone')) ?>" alt="">
+        <?php /* Warframe0058 ledge — transparent voids; spikes define the seam to Starchart */ ?>
+        <div class="update-summary__divider" data-node-id="3589:6386" aria-hidden="true">
+            <img
+                class="update-summary__divider-img"
+                src="<?= e(asset_url('divider')) ?>"
+                alt=""
+                width="1925"
+                height="573"
+            >
         </div>
 
-        <div class="update-summary__cards">
+        <?php /* Promo cards sit on the cinematic, above the hanging spikes */ ?>
+        <div class="update-summary__cards" data-node-id="3694:6780">
             <?php foreach ($promoCards as $card): ?>
                 <article class="promo-card" data-animate="card">
                     <div class="promo-card__media">

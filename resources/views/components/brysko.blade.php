@@ -3,7 +3,8 @@
         <img class="brysko__bg" src="<?= e(asset_url('brysko_bg')) ?>" alt="">
         <div class="brysko__scrim"></div>
 
-        <div class="brysko__frame brysko__frame--top" data-rain-border aria-hidden="true">
+        <?php /* Caps sit on section seams (Figma divider2 @ y≈-6 / y≈1166) to hide hard edges */ ?>
+        <div class="brysko__frame brysko__frame--top" aria-hidden="true">
             <img src="<?= e(asset_url('divider_jagged')) ?>" alt="">
         </div>
         <div class="brysko__frame brysko__frame--bottom" aria-hidden="true">
@@ -38,7 +39,10 @@
                     <?php endforeach; ?>
                 </div>
 
-                <div class="ability-panel__card" style="--noise: url('<?= e(asset_url('ability_card')) ?>')">
+                <div
+                    class="ability-panel__card"
+                    style="--noise: url('<?= e(asset_url('ability_card')) ?>')"
+                >
                     <?php foreach ($abilities as $index => $ability): ?>
                         <div
                             class="ability-panel__detail<?= $index === 0 ? ' is-active' : '' ?>"

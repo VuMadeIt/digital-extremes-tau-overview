@@ -18,14 +18,12 @@
                 Description of update lorem
             </p>
         </div>
-        <div class="starchart__map" data-rain-border>
+        <div class="starchart__map">
             <img src="<?= e(asset_url('starchart_map')) ?>" alt="Tau starchart map">
         </div>
     </div>
 
-    {{-- Planets: Figma frame 3599:6418 — page coords relative to y=4495 --}}
     <div class="planets" data-node-id="3599:6418">
-        {{-- Fornax smoke (behind) --}}
         <img
             class="planets__smoke planets__smoke--fornax-a fog-sway"
             src="<?= e(asset_url('smoke')) ?>"
@@ -41,7 +39,6 @@
             data-fog
         >
 
-        {{-- Fornax planet + markers --}}
         <div class="planets__fornax-art">
             <img
                 class="planets__fornax-planet"
@@ -84,7 +81,6 @@
             <a class="btn btn--primary planet__cta" href="#fornax">Explore Fornax</a>
         </div>
 
-        {{-- Perita smoke --}}
         <img
             class="planets__smoke planets__smoke--perita-a fog-sway"
             src="<?= e(asset_url('smoke')) ?>"

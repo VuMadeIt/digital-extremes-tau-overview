@@ -94,11 +94,11 @@ class OverviewController
                 ],
             ],
             'abilities' => [
-                ['name' => 'Cold Case', 'type' => 'PASSIVE.', 'icon' => asset_url('passive'), 'body' => 'Lorem ipsum dolor sit amet consectetur. Pharetra sed sed enim lectus fermentum. Metus quis nibh sed lectus sagittis fames.'],
                 ['name' => 'Interrogate', 'type' => 'ABILITY 1.', 'icon' => asset_url('ability_1'), 'body' => 'Lorem ipsum dolor sit amet consectetur. Pharetra sed sed enim lectus fermentum. Metus quis nibh sed lectus sagittis fames.'],
                 ['name' => 'Lead Trace', 'type' => 'ABILITY 2.', 'icon' => asset_url('ability_2'), 'body' => 'Lorem ipsum dolor sit amet consectetur. Pharetra sed sed enim lectus fermentum. Metus quis nibh sed lectus sagittis fames.'],
                 ['name' => 'Containment', 'type' => 'ABILITY 3.', 'icon' => asset_url('ability_3'), 'body' => 'Lorem ipsum dolor sit amet consectetur. Pharetra sed sed enim lectus fermentum. Metus quis nibh sed lectus sagittis fames.'],
                 ['name' => 'Final Verdict', 'type' => 'ABILITY 4.', 'icon' => asset_url('ability_4'), 'body' => 'Lorem ipsum dolor sit amet consectetur. Pharetra sed sed enim lectus fermentum. Metus quis nibh sed lectus sagittis fames.'],
+                ['name' => 'Cold Case', 'type' => 'PASSIVE.', 'icon' => asset_url('passive'), 'body' => 'Lorem ipsum dolor sit amet consectetur. Pharetra sed sed enim lectus fermentum. Metus quis nibh sed lectus sagittis fames.'],
             ],
             'tennoCards' => [
                 [
@@ -116,24 +116,25 @@ class OverviewController
             ],
             'qolCards' => [
                 [
-                    'title' => 'Nidus Retouch',
+                    'title' => '[PH] Nidus Retouch',
                     'body' => 'Lorem ipsum dolor sit amet consectetur. Pharetra sed sed enim lectus fermentum.. Metus quis nibh sed lectus sagittis fames.',
-                    'image' => asset_url('qol_1b'),
+                    'layers' => [asset_url('qol_1a'), asset_url('qol_1b')],
                 ],
                 [
-                    'title' => 'Focus School Expansion',
+                    'title' => '[PH] Focus School Expansion',
                     'body' => 'Lorem ipsum dolor sit amet consectetur. Pharetra sed sed enim lectus fermentum.. Metus quis nibh sed lectus sagittis fames.',
-                    'image' => asset_url('qol_2b'),
+                    'thick' => true,
+                    'layers' => [asset_url('qol_2a'), asset_url('qol_2b')],
                 ],
                 [
-                    'title' => 'Appearance Remaster',
+                    'title' => '[PH] Appearance Remaster',
                     'body' => 'Lorem ipsum dolor sit amet consectetur. Pharetra sed sed enim lectus fermentum.. Metus quis nibh sed lectus sagittis fames.',
-                    'image' => asset_url('qol_3b'),
+                    'layers' => [asset_url('qol_3a'), asset_url('qol_3_mid'), asset_url('qol_3b')],
                 ],
                 [
-                    'title' => 'Riven System Changes',
+                    'title' => '[PH] Riven System Changes',
                     'body' => 'Lorem ipsum dolor sit amet consectetur. Pharetra sed sed enim lectus fermentum.. Metus quis nibh sed lectus sagittis fames.',
-                    'image' => asset_url('qol_4'),
+                    'layers' => [asset_url('qol_4')],
                 ],
             ],
             'listenLinks' => [

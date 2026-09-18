@@ -19,3 +19,7 @@ temp/
 
 planet-*-raw.png
 tmp-*.png
+
+tools/
+*.zip
+

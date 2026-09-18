@@ -11,6 +11,8 @@
     "php": "tools/php/php.exe -S localhost:8080 -t public"
   },
   "devDependencies": {
+    "@gradio/client": "^2.7.0",
+    "playwright": "^1.63.0",
     "sass": "^1.77.0"
   }
 }

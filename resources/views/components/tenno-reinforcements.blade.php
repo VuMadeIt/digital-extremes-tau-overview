@@ -25,7 +25,7 @@
 
         <div class="tenno__grid">
             <?php foreach ($cards as $card): ?>
-                <article class="mode-card" data-animate="card" data-rain-surface>
+                <article class="mode-card" data-animate="card">
                     <div class="mode-card__media">
                         <img src="<?= e($card['image']) ?>" alt="">
                     </div>
